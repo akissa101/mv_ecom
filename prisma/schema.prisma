@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+   id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title      String 
+  slug       String @unique
+  imageUrl  String?
+  desc      String?   
+  
+  products  Product[]  
+  marketIds String[] @db.ObjectId
+  markets   Market[]   @relation(fields: [marketIds], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model Market {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String     @unique
+  
+  categoryIds String[]   @db.ObjectId
+  categories  Category[] @relation(fields: [categoryIds], references: [id])
+
+  createdAt     DateTime   @default(now())
+  updatedAt   DateTime?  @updatedAt
+}
+
+model Product {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String    @unique
+  
+  category   Category  @relation(fields: [categoryId], references: [id])
+  categoryId String @db.ObjectId
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+}
+
+model Coupon {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  couponCode   String    @unique
+  expiryDate   DateTime
+  isActive     Boolean   @default(true)
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime? @updatedAt
+}
+
+model Banner {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  link        String
+  imageUrl    String   
+  isActive    Boolean   @default(true)
+
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime? @updatedAt
+}
+
+model Customer {
+    id          String    @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    email       String    @unique
+    phone       Int
+    isActive    Boolean   @default(true)
+    notes       String
+    image       String?
+    joinedDate  DateTime
+
+    createdAt          DateTime  @default(now())
+    updatedAt          DateTime? @updatedAt
+}
